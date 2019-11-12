@@ -1,0 +1,28 @@
+version: '2.1'
+services:
+  yapi:
+    # image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/yapi:v1.8.5-cd990a6
+    build: ./
+    container_name: yapi-server
+    env_file: config/yapi.env
+    restart: always
+    ports:
+      - 8080:3000
+    volumes:
+      - ./data/log/:/home/vendors/log # log dir
+    depends_on:
+      - mongo
+    entrypoint: "bash /wait-for-it.sh mongo:27017 -- entrypoint.sh"
+    networks:
+      - back-net
+  mongo:
+    image: mongo
+    container_name: yapi-mongo
+    restart: always
+    volumes:
+      - ./data/mongodb:/data/db #db dir
+    networks:
+      - back-net
+networks:
+  back-net:
+    external: false

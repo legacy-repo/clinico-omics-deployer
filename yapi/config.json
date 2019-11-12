@@ -1,0 +1,31 @@
+{
+   "port": "DIY-PORT",
+   "closeRegister": false,
+   "versionNotify": true,
+   "adminAccount": "DIY-AC",
+   "db": {
+      "servername": "DIY-DB-SERVER",
+      "DATABASE": "DIY-DB-NAME",
+      "port": "DIY-DB-PORT"
+   },
+   "mail": {
+      "enable": true,
+      "host": "smtp.163.com",
+      "port": 465,
+      "from": "DIY-EMAIL",
+      "auth": {
+          "user": "DIY-EMAIL",
+          "pass": "DIY-EMAIL-PASSWORD"
+      }
+   },
+   "ldapLogin": {
+      "enable": true,
+      "server": "DIY-LDAP-SERVER",
+      "baseDn": "DIY-LDAP-BASEDN",
+      "bindPassword": "DIY-LDAP-PASSWORD",
+      "searchDn": "DIY-LDAP-SEARCHDN",
+      "searchStandard": "DIY-LDAP-SEARCH-STANDARD",
+      "emailKey": "mail",
+      "usernameKey": "username"
+   }
+}
