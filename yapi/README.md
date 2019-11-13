@@ -18,7 +18,7 @@
 | DB_SERVER | mongo(127.0.0.1)  | 不建议修改 |
 | DB_NAME | yapi  | 不建议修改 |
 | DB_PORT | 27017 | 不建议修改|
-| EMAIL | example@163.com | 务必修改 |
+| SENDER_EMAIL | example@163.com | 务必修改 |
 | EMAIL_PASSWORD | your_password | 务必修改 |
 
 

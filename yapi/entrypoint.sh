@@ -7,13 +7,14 @@ then
 	sed -i "s/DIY-DB-SERVER/"${DB_SERVER}"/g" ${HOME}/config.json
 	sed -i "s/DIY-DB-NAME/"${DB_NAME}"/g" ${HOME}/config.json
 	sed -i "s/DIY-DB-PORT/"${DB_PORT}"/g" ${HOME}/config.json
-	sed -i "s/DIY-EMAIL$/"${EMAIL}"/g" ${HOME}/config.json
+	sed -i "s/DIY-SENDER-EMAIL/"${SENDER_EMAIL}"/g" ${HOME}/config.json
 	sed -i "s/DIY-EMAIL-PASSWORD/"${EMAIL_PASSWORD}"/g" ${HOME}/config.json
 	sed -i "s/DIY-LDAP-SERVER/"${LDAP_SERVER}"/g" ${HOME}/config.json
 	sed -i "s/DIY-LDAP-BASEDN/"${LDAP_BASEDN}"/g" ${HOME}/config.json
 	sed -i "s/DIY-LDAP-PASSWORD/"${LDAP_PASSWORD}"/g" ${HOME}/config.json
 	sed -i "s/DIY-LDAP-SEARCHDN/"${LDAP_SEARCHDN}"/g" ${HOME}/config.json
 	sed -i "s/DIY-LDAP-SEARCH-STANDARD/"${LDAP_SEARCH_STANDARD}"/g" ${HOME}/config.json
+
 	mv ${HOME}/config.json ${VENDORS}
 	cp ${VENDORS}/config.json ${HOME}
 	cp ${VENDORS}/config.json ${HOME}/../

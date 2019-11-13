@@ -12,9 +12,9 @@
       "enable": true,
       "host": "smtp.163.com",
       "port": 465,
-      "from": "DIY-EMAIL",
+      "from": "DIY-SENDER-EMAIL",
       "auth": {
-          "user": "DIY-EMAIL",
+          "user": "DIY-SENDER-EMAIL",
           "pass": "DIY-EMAIL-PASSWORD"
       }
    },

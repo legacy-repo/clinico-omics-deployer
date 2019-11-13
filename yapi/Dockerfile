@@ -7,7 +7,7 @@ ENV ADMIN_EMAIL "me@jinfeijie.cn"
 ENV DB_SERVER 	"mongo"
 ENV DB_NAME 	"yapi"
 ENV DB_PORT 	27017
-ENV EMAIL		"me@jinfeijie.cn"
+ENV SENDER_EMAIL "me@jinfeijie.cn"
 ENV EMAIL_PASSWORD "password"
 ENV LDAP_SERVER "ldap://l-ldapt1.com"
 ENV LDAP_BASEDN "CN=Admin,CN=Users,DC=test,DC=com"

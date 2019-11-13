@@ -1,8 +1,8 @@
 version: '2.1'
 services:
   yapi:
-    # image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/yapi:v1.8.5-cd990a6
-    build: ./
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/yapi:v1.8.5-cd990a6
+    # build: ./
     container_name: yapi-server
     env_file: config/yapi.env
     restart: always
