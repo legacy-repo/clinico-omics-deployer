@@ -1,0 +1,7 @@
+.idea/
+.DS_Store
+*.env
+*/data/mongodb/*
+*/data/log/*
+!*/data/mongodb/.gitkeep
+!*/data/log/.gitkeep

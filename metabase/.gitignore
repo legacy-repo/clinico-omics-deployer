@@ -1,0 +1,8 @@
+config/*.env
+data/sysdata/*
+data/userdata/mysql/*
+data/userdata/mysql-log/*
+
+!data/sysdata/.gitkeep
+!data/userdata/mysql/.gitkeep
+!data/userdata/mysql-log/.gitkeep
