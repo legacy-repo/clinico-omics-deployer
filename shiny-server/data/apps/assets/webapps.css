@@ -51,6 +51,11 @@ footer p {
   padding: 1rem 1.25rem 1.25rem 1.25rem;
 }
 
+.card-text {
+  height: 144px;
+  overflow: hidden;
+}
+
 .my-2 {
   color: #fff;
 }
