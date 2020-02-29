@@ -1,0 +1,18 @@
+version: "3.2"
+services:
+  nginx:
+    build: .
+    container_name: nginx
+    volumes:
+      - './nginx_status.conf:/etc/nginx/conf.d/nginx_status.conf'
+      - './collectd:/etc/collectd'
+    external_links:
+      - 'riemann:riemann'
+    ports:
+      - '18080:80'
+    networks:
+      - monitoring_monitoring
+
+networks:
+  monitoring_monitoring:
+    external: true
