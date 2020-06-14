@@ -1,0 +1,18 @@
+version: "3.0"
+
+services:
+  cbioDB:
+    image: "mysql:5.7"
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./my.cnf:/etc/my.cnf
+      - ./data/mysql:/var/lib/mysql
+      - ./data/mysql-log:/var/log/mysql
+    environment:
+      - MYSQL_DATABASE=cromwell
+      - MYSQL_USER=pgx-cromwell
+      - MYSQL_PASSWORD=XXXXXX
+      - MYSQL_ROOT_PASSWORD=XXXXXX

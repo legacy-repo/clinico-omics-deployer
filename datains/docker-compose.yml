@@ -1,0 +1,31 @@
+version: "3"
+
+# All available services
+services:
+  # Misc Storage
+  postgres:
+    container_name: "datains-db"
+    restart: "always"
+    image: postgres
+    env_file:
+      - postgres.env
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data/
+      - ./initdb:/docker-entrypoint-initdb.d/
+    ports:
+      - 54320:5432
+
+  datains:
+    container_name: "datains"
+    restart: "always"
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.1.1-5f66e3ca
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - ./data/datains:/data
+    env_file:
+      - datains.env
+    ports:
+      - 3000:3000

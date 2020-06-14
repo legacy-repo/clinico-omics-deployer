@@ -39,10 +39,10 @@ This assumes the local machine is running on Ubuntu
 6. Update the environment variables ```MB_DB_PASS```, ```MB_DB_HOST```, ```MB_ENCRYPTION_SECRET_KEY``` and save.
 
     ```bash
-    ENV MB_DB_PASS=<put_here_the_password_for_the_metabase_user>
+    MB_DB_PASS=<put_here_the_password_for_the_metabase_user>
     # Make sure the firewall at the database server allows connections to port 54320
-    ENV MB_DB_HOST=<put here the IP address for the Metabase database server e.g. 00.000.000.00>
-    ENV MB_ENCRYPTION_SECRET_KEY=<Add a random string here as the secret>
+    MB_DB_HOST=<put here the IP address for the Metabase database server e.g. 00.000.000.00>
+    MB_ENCRYPTION_SECRET_KEY=<Add a random string here as the secret>
     ```
 
 7. Convert ```config/postgres.env.example``` to ```config/postgres.env```.

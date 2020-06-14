@@ -1,0 +1,3 @@
+[submodule "gen3"]
+	path = gen3
+	url = https://github.com/clinico-omics/gen3
