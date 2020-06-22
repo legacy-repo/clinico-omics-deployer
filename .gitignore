@@ -1,6 +1,7 @@
 .idea/
 .DS_Store
 */config/*.env
+*.env
 */data/mongodb/*
 */data/log/*
 !*/data/mongodb/.gitkeep

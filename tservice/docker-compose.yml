@@ -1,0 +1,15 @@
+version: "3"
+
+# All available services
+services:
+  tservice:
+    container_name: "tservice"
+    restart: "always"
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.0
+    volumes:
+      - ./data/tservice:/data
+    env_file:
+      - tservice.env
+    ports:
+      - 3001:3000
+      - 7001:7000
