@@ -18,14 +18,43 @@ services:
   datains:
     container_name: "datains"
     restart: "always"
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.1.1-5f66e3ca
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.1.6-3805bfc5
     depends_on:
       - postgres
     links:
       - postgres
     volumes:
-      - ./data/datains:/data
+      - /data/minio:/data/minio
     env_file:
       - datains.env
     ports:
       - 3000:3000
+
+  tservice:
+    container_name: "tservice"
+    restart: "always"
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.0
+    volumes:
+      - /data/minio/tservice:/data
+    env_file:
+      - tservice.env
+    ports:
+      - 3001:3000
+      - 7001:7000
+
+  minio:
+    image: "minio/minio"
+    expose:
+      - "9000"
+    ports:
+      - "9000:9000"
+    volumes:
+      - /data/minio:/data/minio
+    env_file:
+      - minio.env
+    command: server /data/minio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
