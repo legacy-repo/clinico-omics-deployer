@@ -11,18 +11,37 @@ services:
       - postgres.env
     volumes:
       - ./data/postgresql:/var/lib/postgresql/data/
-      - ./initdb:/docker-entrypoint-initdb.d/
+      - ./initdb/postgresql:/docker-entrypoint-initdb.d/
     ports:
       - 54320:5432
+
+  mongodb:
+    image: mongo:4.0.5
+    container_name: mongodb
+    hostname: mongodb
+    volumes:
+      - ./conf/mongod.conf:/etc/mongod.conf
+      - ./initdb/mongodb:/docker-entrypoint-initdb.d/
+      - ./data/mongodb/data:/data/db/
+      - ./data/mongodb/log:/var/log/mongodb/
+    env_file:
+      - mongodb.env
+    ports:
+      - "27017:27017"
+    command: ["-f", "/etc/mongod.conf"]
 
   datains:
     container_name: "datains"
     restart: "always"
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.1.6-3805bfc5
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.0-86666c14
     depends_on:
       - postgres
+      - minio
+      - tservice
+      - mongodb
     links:
       - postgres
+      - mongodb
     volumes:
       - /data/minio:/data/minio
     env_file:
@@ -43,6 +62,8 @@ services:
       - 7001:7000
 
   minio:
+    container_name: "minio"
+    restart: "always"
     image: "minio/minio"
     expose:
       - "9000"
@@ -50,8 +71,9 @@ services:
       - "9000:9000"
     volumes:
       - /data/minio:/data/minio
-    env_file:
-      - minio.env
+    environment:
+      - MINIO_ACCESS_KEY=pgx-lab
+      - MINIO_SECRET_KEY=4gmPNjG5JKRX1cbuxTqO
     command: server /data/minio
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
