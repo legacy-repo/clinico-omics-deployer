@@ -17,6 +17,7 @@ services:
 
   mongodb:
     image: mongo:4.0.5
+    restart: "always"
     container_name: mongodb
     hostname: mongodb
     volumes:
@@ -52,7 +53,7 @@ services:
   tservice:
     container_name: "tservice"
     restart: "always"
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.0
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.0-7ca7ac6c
     volumes:
       - /data/minio/tservice:/data
     env_file:
