@@ -1,3 +1,6 @@
 [submodule "gen3"]
 	path = gen3
 	url = https://github.com/clinico-omics/gen3
+[submodule "datains/lib"]
+	path = datains/lib
+	url = https://github.com/clinico-omics/tservice-plugins
