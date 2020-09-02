@@ -34,7 +34,7 @@ services:
   datains:
     container_name: "datains"
     restart: "always"
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.1-ccdf6cc8
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.4-553e4e22
     depends_on:
       - postgres
       - minio
@@ -53,7 +53,7 @@ services:
   tservice:
     container_name: "tservice"
     restart: "always"
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.3-533bfaa7
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.4-b97c10f5
     volumes:
       - /data/minio:/data/minio
       - ./lib/plugins:/plugins
@@ -62,7 +62,6 @@ services:
       - tservice.env
     ports:
       - 3001:3000
-      - 7001:7000
 
   minio:
     container_name: "minio"
