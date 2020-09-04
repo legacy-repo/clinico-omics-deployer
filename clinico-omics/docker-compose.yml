@@ -5,7 +5,10 @@ services:
   # Misc Storage
   postgres:
     container_name: "datains-db"
+    hostname: "datains-db"
     restart: "always"
+    networks:
+      - clinico-omics
     image: postgres
     env_file:
       - postgres.env
@@ -18,8 +21,10 @@ services:
   mongodb:
     image: mongo:4.0.5
     restart: "always"
-    container_name: mongodb
-    hostname: mongodb
+    networks:
+      - clinico-omics
+    container_name: "datains-mongodb"
+    hostname: "datains-mongodb"
     volumes:
       - ./conf/mongod.conf:/etc/mongod.conf
       - ./initdb/mongodb:/docker-entrypoint-initdb.d/
@@ -33,7 +38,10 @@ services:
 
   datains:
     container_name: "datains"
+    hostname: "datains"
     restart: "always"
+    networks:
+      - clinico-omics
     image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.4-553e4e22
     depends_on:
       - postgres
@@ -52,7 +60,10 @@ services:
 
   tservice:
     container_name: "tservice"
+    hostname: "tservice"
     restart: "always"
+    networks:
+      - clinico-omics
     image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.4-b97c10f5
     volumes:
       - /data/minio:/data/minio
@@ -65,8 +76,11 @@ services:
 
   minio:
     container_name: "minio"
+    hostname: "minio"
     restart: "always"
     image: "minio/minio"
+    networks:
+      - clinico-omics
     expose:
       - "9000"
     ports:
@@ -82,3 +96,8 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+
+networks:
+  clinico-omics:
+    external:
+      name: clinico-omics-network
