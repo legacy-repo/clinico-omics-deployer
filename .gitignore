@@ -6,3 +6,6 @@
 */data/log/*
 !*/data/mongodb/.gitkeep
 !*/data/log/.gitkeep
+*.edn
+maxkey
+arkid-core

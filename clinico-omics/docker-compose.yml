@@ -42,7 +42,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.4-553e4e22
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.6-418a0b60
     depends_on:
       - postgres
       - minio
@@ -51,10 +51,11 @@ services:
     links:
       - postgres
       - mongodb
+    environment: 
+      JAVA_OPTS: '-Dconf=/datains-conf.edn'
     volumes:
       - /data/minio:/data/minio
-    env_file:
-      - datains.env
+      - ./datains-conf.edn:/datains-conf.edn
     ports:
       - 3000:3000
 
@@ -69,8 +70,9 @@ services:
       - /data/minio:/data/minio
       - ./lib/plugins:/plugins
       - ./lib/external:/external-bin
-    env_file:
-      - tservice.env
+      - ./tservice-conf.edn:/tservice-conf.edn
+    environment: 
+      JAVA_OPTS: '-Dconf=/tservice-conf.edn'
     ports:
       - 3001:3000
 
