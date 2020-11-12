@@ -7,7 +7,7 @@
  ;; when :nrepl-port is set the application starts the nREPL server on load
  :nrepl-port             7000
 
-                                        ; set your dev database connection URL here
+ ;; set your dev database connection URL here
  :database-url           "postgresql://postgres:5432/datains?user=datains_user&password=datains_password"
  :datains-workdir        "/data/minio"
  :app-store-access-token "xxxx"
@@ -27,9 +27,6 @@
                 :fs-secret-key          "xxxx"
                 :fs-rootdir             ""}]
  :default-fs-service "minio"
- :mongo-uri              "mongodb://datains:password@mongodb:27017/datains"
- :mongo-collection       "datains"
- :tservice               "http://example.com:3001"
  :cromwell               {:url    "http://example.com:8000"
                           :token  ""
                           :labels [:data_type
@@ -40,7 +37,6 @@
  :tasks                  {:submit-jobs {:cron "0 */1 * * * ?"}
                           :sync-jobs   {:cron "0 */1 * * * ?"}
                           :sync-apps   {:cron "0 */1 * * * ?"}
-                          :sync-projects {:cron "0 */1 * * * ?"}
-                          :submit-reports {:cron "0 */1 * * * ?"}}
+                          :sync-projects {:cron "0 */1 * * * ?"}}
  :dingtalk-access-token  "xxxx"
  :dingtalk-secret        "xxxx"}

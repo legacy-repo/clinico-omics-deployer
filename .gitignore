@@ -9,3 +9,4 @@
 *.edn
 maxkey
 arkid-core
+shiny-server/data

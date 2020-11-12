@@ -4,3 +4,6 @@
 [submodule "datains/lib"]
 	path = datains/lib
 	url = https://github.com/clinico-omics/tservice-plugins
+[submodule "clinico-omics-core/lib"]
+	path = clinico-omics-core/lib
+	url = https://github.com/clinico-omics/tservice-plugins

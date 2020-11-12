@@ -5,7 +5,8 @@ services:
     container_name: shiny
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
-    image: ${SHINY_SERVER_DOCKER_REPO}:${SHINY_SERVER_BUILD_VERSION}
+    # image: ${SHINY_SERVER_DOCKER_REPO}:${SHINY_SERVER_BUILD_VERSION}
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/shiny-server:tgmc-74c855c
     # build:
     #   context: .
     #   dockerfile: Dockerfile
@@ -15,7 +16,8 @@ services:
     # below.
     user: 'root'
     # Uncomment the lines below to disable application logs STDOUT output
-    # environment:
+    environment:
+      - RENV_PATHS_CACHE=/srv/library
     #   - APPLICATION_LOGS_TO_STDOUT=false
     ports:
       - '8081:3838'
@@ -25,3 +27,4 @@ services:
       # going to localhost:80 in one's web browser will show a "Welcome to
       # Shiny Server!" diagnostics page.
       - './data/apps:/srv/shiny-server'
+      - './data/library:/srv/library'

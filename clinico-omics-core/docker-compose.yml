@@ -1,4 +1,4 @@
-version: "3"
+version: "3.3"
 
 # All available services
 services:
@@ -36,46 +36,6 @@ services:
       - "27017:27017"
     command: ["-f", "/etc/mongod.conf"]
 
-  datains:
-    container_name: "datains"
-    hostname: "datains"
-    restart: "always"
-    networks:
-      - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.2.8-2aff5e7b
-    depends_on:
-      - postgres
-      - minio
-      - tservice
-      - mongodb
-    links:
-      - postgres
-      - mongodb
-    environment: 
-      JAVA_OPTS: '-Dconf=/datains-conf.edn'
-    volumes:
-      - /data/minio:/data/minio
-      - ./datains-conf.edn:/datains-conf.edn
-    ports:
-      - 3000:3000
-
-  tservice:
-    container_name: "tservice"
-    hostname: "tservice"
-    restart: "always"
-    networks:
-      - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.4-b97c10f5
-    volumes:
-      - /data/minio:/data/minio
-      - ./lib/plugins:/plugins
-      - ./lib/external:/external-bin
-      - ./tservice-conf.edn:/tservice-conf.edn
-    environment: 
-      JAVA_OPTS: '-Dconf=/tservice-conf.edn'
-    ports:
-      - 3001:3000
-
   minio:
     container_name: "minio"
     hostname: "minio"
@@ -98,6 +58,66 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+
+  datains:
+    container_name: "datains"
+    hostname: "datains"
+    restart: "always"
+    networks:
+      - clinico-omics
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.0-62a53fb2
+    depends_on:
+      - postgres
+      - minio
+    links:
+      - postgres
+    environment: 
+      JAVA_OPTS: '-Dconf=/datains-conf.edn'
+    volumes:
+      - /data/minio:/data/minio
+      - ./datains-conf.edn:/datains-conf.edn
+    ports:
+      - 3000:3000
+
+  tservice:
+    container_name: "tservice"
+    hostname: "tservice"
+    restart: "always"
+    networks:
+      - clinico-omics
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.5-a6da32bc
+    depends_on: 
+      - minio
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - /data/minio:/data/minio
+      - ./lib/plugins:/plugins
+      - ./lib/external:/external-bin
+      - ./tservice-conf.edn:/tservice-conf.edn
+    environment: 
+      JAVA_OPTS: '-Dconf=/tservice-conf.edn'
+    ports:
+      - 3001:3000
+
+  dataseq_core:
+    container_name: "dataseq-core"
+    hostname: "dataseq-core"
+    restart: "always"
+    networks:
+      - clinico-omics
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.1.1-26ec5e35
+    depends_on: 
+      - mongodb
+    links:
+      - mongodb
+    volumes:
+      - ./dataseq-core-conf.edn:/dataseq-core-conf.edn
+    environment: 
+      JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
+    ports:
+      - 3002:3000
 
 networks:
   clinico-omics:

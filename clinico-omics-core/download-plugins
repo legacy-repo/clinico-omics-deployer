@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-git clone --depth 1 https://github.com/clinico-omics/tservice-plugins.git lib
+rm -rf lib
+git submodule add https://github.com/clinico-omics/tservice-plugins lib

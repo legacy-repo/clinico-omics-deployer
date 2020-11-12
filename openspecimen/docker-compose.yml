@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  openspecimen-db:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: openspecimen
+      MYSQL_DATABASE: openspecimen
+      MYSQL_USER: openspecimen
+      MYSQL_PASSWORD: openspecimen
+    volumes: 
+      - ./mysqld.conf:/etc/mysql/mysql.conf.d/mysqld.cnf
+
+  openspecimen:
+    image: bibbox/openspecimen
+    ports:
+      - "8080:8080"
+    restart: always
+    links:
+      - openspecimen-db
+    depends_on:
+      - openspecimen-db
