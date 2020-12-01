@@ -1,0 +1,84 @@
+version: '3.3'
+services:
+  portal:
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/nginx-auth:base
+    container_name: ${INSTANCE}-portal
+    restart: always
+    environment:
+      USERNAME: "admin"
+      PASSWORD: $BASIC_AUTH_PASSWD
+      AUTH_MODE: $AUTH_MODE
+      USER_INFO_URL: $USER_INFO_URL
+    networks:
+      - clinico-omics-network
+    ports:
+      - ${HTTP_PORT}:80
+    volumes:
+      - ${WORKSPACE}/nginx:/conf/nginx
+      - ${WORKSPACE}/resty/http.lua:/usr/local/openresty/lualib/resty/http.lua
+      - ${WORKSPACE}/resty/http_headers.lua:/usr/local/openresty/lualib/resty/http_headers.lua
+
+  mysql:
+    image: mysql:5.7.32
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - clinico-omics-network
+    environment:
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USER=keycloak
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - ${WORKSPACE}/db/data:/var/lib/mysql
+    healthcheck:
+     test: "mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}"
+
+  keycloak:
+    image: jboss/keycloak:11.0.3
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=mysql
+      - DB_ADDR=mysql
+      - DB_USER=keycloak
+      - DB_PASSWORD=password
+      - JDBC_PARAMS=useSSL=false
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+      - clinico-omics-network
+    healthcheck:
+     test: "curl -f http://localhost:8080/auth || exit 1"
+     
+  ldap-host:
+    image: osixia/openldap:1.4.0
+    container_name: ldap-host
+    environment:
+      - LDAP_ORGANISATION="MyCompany Inc."
+      - LDAP_DOMAIN=mycompany.com
+    ports:
+      - "389:389"
+    networks:
+      - clinico-omics-network
+
+  phpldapadmin-service:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: phpldapadmin-service
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap-host
+    ports:
+      - "6443:443"
+    depends_on:
+      - ldap-host
+    networks:
+      - clinico-omics-network
+
+networks:
+  clinico-omics-network:
+    external:
+      name: clinico-omics-network
