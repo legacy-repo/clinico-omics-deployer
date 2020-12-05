@@ -6,9 +6,13 @@
  :port 3000
  ;; when :nrepl-port is set the application starts the nREPL server on load
  :nrepl-port 7000
- :external-bin "/external-bin/.env/bin:/external-bin:$PATH"
+ :database-url "postgresql://postgres:5432/tservice?user=tservice&password=password"
+ ;; Shiny Server
+ :proxy-server-dir "XXX/shiny-server/mountpoints/apps/"
+ :proxy-server "http://XXX/"
+ :external-bin "/external-bin/.env/bin:/tservice-plugins/external/bin:$PATH"
  :tservice-workdir "/data/minio/tservice"
- :tservice-plugin-path "/plugins"
+ :tservice-plugin-path "/tservice-plugins"
  :fs-services [{:fs-service             "minio"
                 :fs-endpoint            "http://example.com:9000"
                 :fs-access-key          "xxxx"
