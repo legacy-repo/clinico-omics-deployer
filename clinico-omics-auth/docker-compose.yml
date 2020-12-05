@@ -6,9 +6,11 @@ services:
     restart: always
     environment:
       USERNAME: ${USERNAME}
-      PASSWORD: ${BASIC_AUTH_PASSWD}
+      PASSWORD: ${PASSWORD}
       AUTH_MODE: ${AUTH_MODE}
-      USER_INFO_URL: ${USER_INFO_URL}
+      INTROSPEC_ENDPOINT: ${INTROSPEC_ENDPOINT}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
     networks:
       - clinico-omics-network
     ports:
@@ -17,6 +19,7 @@ services:
       - ${WORKSPACE}/nginx:/conf/nginx
       - ${WORKSPACE}/resty/http.lua:/usr/local/openresty/lualib/resty/http.lua
       - ${WORKSPACE}/resty/http_headers.lua:/usr/local/openresty/lualib/resty/http_headers.lua
+      - ${WORKSPACE}/resty/openidc.lua:/usr/local/openresty/lualib/resty/openidc.lua
 
   mysql:
     image: mysql:5.7.32

@@ -9,4 +9,4 @@
 
  ; set your dev database connection URL here
  :mongo-uri              "mongodb://datains:password@mongodb:27017/datains"
- :mongo-collection       "datains"}
+ :mongo-schema-collection       "schema"}
