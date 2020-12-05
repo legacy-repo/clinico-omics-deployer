@@ -5,10 +5,10 @@ services:
     container_name: ${INSTANCE}-portal
     restart: always
     environment:
-      USERNAME: "admin"
-      PASSWORD: $BASIC_AUTH_PASSWD
-      AUTH_MODE: $AUTH_MODE
-      USER_INFO_URL: $USER_INFO_URL
+      USERNAME: ${USERNAME}
+      PASSWORD: ${BASIC_AUTH_PASSWD}
+      AUTH_MODE: ${AUTH_MODE}
+      USER_INFO_URL: ${USER_INFO_URL}
     networks:
       - clinico-omics-network
     ports:
@@ -21,15 +21,17 @@ services:
   mysql:
     image: mysql:5.7.32
     container_name: mysql
+    expose: 
+      - "3306"
     ports:
       - "3306:3306"
     networks:
       - clinico-omics-network
     environment:
-      - MYSQL_DATABASE=keycloak
-      - MYSQL_USER=keycloak
-      - MYSQL_PASSWORD=password
-      - MYSQL_ROOT_PASSWORD=root_password
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - ${WORKSPACE}/db/data:/var/lib/mysql
     healthcheck:
@@ -39,15 +41,17 @@ services:
     image: jboss/keycloak:11.0.3
     container_name: keycloak
     environment:
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
-      - DB_VENDOR=mysql
-      - DB_ADDR=mysql
-      - DB_USER=keycloak
-      - DB_PASSWORD=password
-      - JDBC_PARAMS=useSSL=false
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      DB_VENDOR: ${DB_VENDOR}
+      DB_ADDR: ${DB_ADDR}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JDBC_PARAMS: ${JDBC_PARAMS}
     depends_on:
       - mysql
+    expose: 
+      - "8080"
     ports:
       - "8080:8080"
     networks:
@@ -55,28 +59,28 @@ services:
     healthcheck:
      test: "curl -f http://localhost:8080/auth || exit 1"
      
-  ldap-host:
-    image: osixia/openldap:1.4.0
-    container_name: ldap-host
-    environment:
-      - LDAP_ORGANISATION="MyCompany Inc."
-      - LDAP_DOMAIN=mycompany.com
-    ports:
-      - "389:389"
-    networks:
-      - clinico-omics-network
+  # ldap-host:
+  #   image: osixia/openldap:1.4.0
+  #   container_name: ldap-host
+  #   environment:
+  #     - LDAP_ORGANISATION="MyCompany Inc."
+  #     - LDAP_DOMAIN=mycompany.com
+  #   ports:
+  #     - "389:389"
+  #   networks:
+  #     - clinico-omics-network
 
-  phpldapadmin-service:
-    image: osixia/phpldapadmin:0.9.0
-    container_name: phpldapadmin-service
-    environment:
-      - PHPLDAPADMIN_LDAP_HOSTS=ldap-host
-    ports:
-      - "6443:443"
-    depends_on:
-      - ldap-host
-    networks:
-      - clinico-omics-network
+  # phpldapadmin-service:
+  #   image: osixia/phpldapadmin:0.9.0
+  #   container_name: phpldapadmin-service
+  #   environment:
+  #     - PHPLDAPADMIN_LDAP_HOSTS=ldap-host
+  #   ports:
+  #     - "6443:443"
+  #   depends_on:
+  #     - ldap-host
+  #   networks:
+  #     - clinico-omics-network
 
 networks:
   clinico-omics-network:

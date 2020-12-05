@@ -49,9 +49,8 @@ services:
       - "9000:9000"
     volumes:
       - /data/minio:/data/minio
-    environment:
-      - MINIO_ACCESS_KEY=pgx-lab
-      - MINIO_SECRET_KEY=4gmPNjG5JKRX1cbuxTqO
+    env_file:
+      - minio.env
     command: server /data/minio
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -65,7 +64,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.0-62a53fb2
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.1-ad9aff55
     depends_on:
       - postgres
       - minio
@@ -76,8 +75,10 @@ services:
     volumes:
       - /data/minio:/data/minio
       - ./datains-conf.edn:/datains-conf.edn
-    ports:
-      - 3000:3000
+    expose:
+      - "3000"
+    # ports:
+    #   - 3000:3000
 
   tservice:
     container_name: "tservice"
@@ -85,7 +86,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.5-44ca22c4
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.5-1241c3da
     depends_on: 
       - minio
       - postgres
@@ -98,8 +99,10 @@ services:
       - ./tservice-conf.edn:/tservice-conf.edn
     environment: 
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
-    ports:
-      - 3001:3000
+    expose:
+      - "3000"
+    # ports:
+    #   - 3001:3000
 
   dataseq_core:
     container_name: "dataseq-core"
@@ -107,7 +110,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.1.1-f2b73031
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.1-58b9906d
     depends_on: 
       - mongodb
     links:
@@ -116,8 +119,10 @@ services:
       - ./dataseq-core-conf.edn:/dataseq-core-conf.edn
     environment: 
       JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
-    ports:
-      - 3002:3000
+    expose:
+      - "3000"
+    # ports:
+    #  - 3002:3000
 
 networks:
   clinico-omics:
