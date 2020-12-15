@@ -64,7 +64,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.1-ad9aff55
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.3-a48d05cb
     depends_on:
       - postgres
       - minio
@@ -86,7 +86,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.5-1241c3da
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.6-b2192d1d
     depends_on: 
       - minio
       - postgres
@@ -109,7 +109,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.1-58b9906d
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.2-b2192d1d
     depends_on: 
       - mongodb
     links:
