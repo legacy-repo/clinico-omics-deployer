@@ -98,6 +98,7 @@ services:
       - ./tservice-conf.edn:/tservice-conf.edn
     environment: 
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
+      RENV_PATHS_CACHE: '/tservice-plugins/cache'
     expose:
       - "3000"
     # ports:

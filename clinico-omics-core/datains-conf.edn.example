@@ -28,6 +28,7 @@
                 :fs-rootdir             ""}]
  :default-fs-service "minio"
  :cromwell               {:url    "http://example.com:8000"
+                          :workflow-root "oss://choppy-cromwell-result/test-choppy/"
                           :token  ""
                           :labels [:data_type
                                    :project
