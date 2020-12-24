@@ -86,7 +86,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.6-b2192d1d
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.7-b09dbb47
     depends_on: 
       - minio
       - postgres
