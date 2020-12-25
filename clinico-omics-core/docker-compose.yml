@@ -86,7 +86,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.7-b09dbb47
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.8-bb54e770
     depends_on: 
       - minio
       - postgres
@@ -97,6 +97,7 @@ services:
       - ./tservice-plugins:/tservice-plugins
       - ./tservice-conf.edn:/tservice-conf.edn
     environment: 
+      WORKDIR: '/data/minio/tservice'
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
       RENV_PATHS_CACHE: '/tservice-plugins/cache'
     expose:

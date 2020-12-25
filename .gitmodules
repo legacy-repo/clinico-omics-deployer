@@ -1,6 +1,3 @@
-[submodule "gen3"]
-        url = https://github.com/clinico-omics/gen3
-        active = true
 [submodule "clinico-omics-core/tservice-plugins"]
-        url = https://github.com/clinico-omics/tservice-plugins
-        active = true
+	path = clinico-omics-core/tservice-plugins
+	url = https://github.com/clinico-omics/tservice-plugins
