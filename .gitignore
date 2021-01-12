@@ -10,3 +10,5 @@
 maxkey
 arkid-core
 shiny-server/data
+.clj-kondo/
+.lsp/

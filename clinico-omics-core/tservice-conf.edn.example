@@ -10,7 +10,7 @@
  ;; Shiny Server
  :proxy-server-dir "XXX/shiny-server/mountpoints/apps/"
  :proxy-server "http://XXX/"
- :external-bin "/external-bin/.env/bin:/tservice-plugins/external/bin:$PATH"
+ :external-bin "/tservice-plugins/external/.env/bin:$PATH"
  :tservice-workdir "/data/minio/tservice"
  :tservice-plugin-path "/tservice-plugins"
  :fs-services [{:fs-service             "minio"
