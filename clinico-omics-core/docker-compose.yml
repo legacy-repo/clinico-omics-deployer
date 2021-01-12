@@ -111,7 +111,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.2-b2192d1d
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.4-34e17799
     depends_on: 
       - mongodb
     links:
