@@ -15,6 +15,7 @@ services:
     volumes:
       - ./data/postgresql:/var/lib/postgresql/data/
       - ./initdb/postgresql:/docker-entrypoint-initdb.d/
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - 54320:5432
 
@@ -30,6 +31,7 @@ services:
       - ./initdb/mongodb:/docker-entrypoint-initdb.d/
       - ./data/mongodb/data:/data/db/
       - ./data/mongodb/log:/var/log/mongodb/
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - mongodb.env
     ports:
@@ -49,6 +51,7 @@ services:
       - "9000:9000"
     volumes:
       - /data/minio:/data/minio
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - minio.env
     command: server /data/minio
@@ -64,7 +67,7 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.3-a48d05cb
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.4-9a36403d
     depends_on:
       - postgres
       - minio
@@ -75,6 +78,7 @@ services:
     volumes:
       - /data/minio:/data/minio
       - ./datains-conf.edn:/datains-conf.edn
+      - /etc/localtime:/etc/localtime:ro
     expose:
       - "3000"
     # ports:
@@ -96,6 +100,7 @@ services:
       - /data/minio:/data/minio
       - ./tservice-plugins:/tservice-plugins
       - ./tservice-conf.edn:/tservice-conf.edn
+      - /etc/localtime:/etc/localtime:ro
     environment: 
       WORKDIR: '/data/minio/tservice'
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
@@ -111,13 +116,14 @@ services:
     restart: "always"
     networks:
       - clinico-omics
-    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.4-34e17799
+    image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.7-326f3544
     depends_on: 
       - mongodb
     links:
       - mongodb
     volumes:
       - ./dataseq-core-conf.edn:/dataseq-core-conf.edn
+      - /etc/localtime:/etc/localtime:ro
     environment: 
       JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
     expose:
