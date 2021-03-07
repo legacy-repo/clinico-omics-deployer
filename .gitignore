@@ -13,4 +13,6 @@ shiny-server/data
 .clj-kondo/
 .lsp/
 custom/*
-!custom/env
+!custom/.gitkeep
+.vscode
+*docker-compose.yml

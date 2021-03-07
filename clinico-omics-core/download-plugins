@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-rm -rf lib
-git submodule add https://github.com/clinico-omics/tservice-plugins lib

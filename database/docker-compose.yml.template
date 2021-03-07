@@ -1,0 +1,62 @@
+version: '3.3'
+services:
+  mysql:
+    image: {{ mysql_image }}
+    container_name: {{ instance }}-mysql
+    expose: 
+      - "3306"
+    ports:
+      - 3306:3306
+    networks:
+      - {{ network }}
+    environment:
+      MYSQL_DATABASE: {{ mysql_database }}
+      MYSQL_USER: {{ mysql_user }}
+      MYSQL_PASSWORD: {{ mysql_password }}
+      MYSQL_ROOT_PASSWORD: {{ mysql_root_password }}
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+     test: "mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}"
+
+  # Misc Storage
+  postgres:
+    image: {{ postgres_image }}
+    container_name: {{ instance }}-postgresql
+    restart: "always"
+    networks:
+      - {{ network }}
+    environment:
+      POSTGRES_PASSWORD: {{ postgres_password }}
+      DATAINS_PASSWORD: {{ datains_password }}
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data/
+      - ./initdb/postgresql:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+
+  mongodb:
+    image: {{ mongodb_image }}
+    restart: "always"
+    networks:
+      - {{ network }}
+    container_name: {{ instance }}-mongodb
+    volumes:
+      - ./conf/mongod.conf:/etc/mongod.conf
+      - ./initdb/mongodb:/docker-entrypoint-initdb.d/
+      - ./data/mongodb/data:/data/db/
+      - ./data/mongodb/log:/var/log/mongodb/
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME={{ mongo_initdb_root_username }}
+      - MONGO_INITDB_ROOT_PASSWORD={{ mongo_initdb_root_password }}
+      - MONGO_INITDB_DATABASE={{ mongo_initdb_database }}
+      - MONGO_INITDB_USERNAME={{ mongo_initdb_username }}
+      - MONGO_INITDB_PASSWORD={{ mongo_initdb_password }}
+    ports:
+      - "27017:27017"
+    command: ["-f", "/etc/mongod.conf"]
+
+networks:
+  {{ network }}:
+    external:
+      name: {{ network }}

@@ -1,0 +1,89 @@
+version: "3.3"
+
+# All available services
+services:
+  minio:
+    image: {{ minio_image }}
+    container_name: "{{ instance }}-minio"
+    restart: "always"
+    networks:
+      - {{ network }}
+    expose:
+      - "9000"
+    ports:
+      - "9000:9000"
+    volumes:
+      - {{ workdir }}/minio:/data/minio
+    environment:
+      MINIO_ACCESS_KEY: {{ minio_access_key }}
+      MINIO_SECRET_KEY: {{ minio_secret_key }}
+    command: server /data/minio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  datains:
+    image: {{ datains_image }}
+    container_name: "{{ instance }}-datains"
+    restart: "always"
+    networks:
+      - {{ network }}
+    depends_on:
+      - postgres
+      - minio
+    links:
+      - postgres
+    environment: 
+      JAVA_OPTS: '-Dconf=/datains-conf.edn'
+    volumes:
+      - {{ workdir }}/minio:/data/minio
+      - ./datains-conf.edn:/datains-conf.edn
+    expose:
+      - "3000"
+
+  tservice:
+    image: {{ tservice_image }}
+    container_name: "{{ instance }}-tservice"
+    hostname: "tservice"
+    restart: "always"
+    networks:
+      - {{ network }}
+    depends_on: 
+      - minio
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - {{ workdir }}/minio:/data/minio
+      - ./tservice-plugins:/tservice-plugins
+      - ./tservice-conf.edn:/tservice-conf.edn
+    environment: 
+      WORKDIR: '/data/minio/tservice'
+      JAVA_OPTS: '-Dconf=/tservice-conf.edn'
+      RENV_PATHS_CACHE: '/tservice-plugins/cache'
+    expose:
+      - "3000"
+
+  dataseq_core:
+    image: {{ dataseq_core_image }}
+    container_name: "{{ instance }}-dataseq-core"
+    restart: "always"
+    networks:
+      - {{ network }}
+    depends_on: 
+      - mongodb
+    links:
+      - mongodb
+    volumes:
+      - ./dataseq-core-conf.edn:/dataseq-core-conf.edn
+    environment: 
+      JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
+    expose:
+      - "3000"
+
+networks:
+  {{ network }}:
+    external:
+      name: {{ network }}

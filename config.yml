@@ -1,0 +1,123 @@
+# Don't change any field which is prefix with & and *
+common:
+  instance: &instance "clinico-omics"
+  network: &network "clinico-omics-network"
+  workdir: &workdir "/data"
+
+storage:
+  minio_endpoint: &minio_endpoint "http://example.com:9000"
+  # OSS
+  enable_oss: &enable_oss false
+  oss_endpoint: &oss_endpoint "http://oss-cn-shanghai.aliyuncs.com"
+  oss_access_key: &oss_access_key "oss_access_key"
+  oss_secret_key: &oss_secret_key "oss_secret_key"
+  default_fs_service: &default_fs_service "minio"
+
+services:
+  database:
+    docker-compose.yml:
+      # Common
+      instance: *instance
+      network: *network
+      # MySQL
+      mysql_image: "mysql:5.7.32"
+      mysql_database: ""
+      mysql_user: &mysql_user ""
+      mysql_password: &mysql_password ""
+      mysql_root_password: ""
+      # PostgreSQL
+      postgres_image: "postgres"
+      postgres_password: ""
+      datains_password: &datains_password ""
+      # MongoDB
+      mongodb_image: "mongo:4.0.5"
+      mongo_initdb_root_username: ""
+      mongo_initdb_root_password: ""
+      mongo_initdb_database: "dataseq-core"
+      mongo_initdb_username: &mongo_initdb_username ""
+      mongo_initdb_password: &mongo_initdb_password ""
+
+  clinico-omics-auth:
+    docker-compose.yml:
+      instance: *instance
+      network: *network
+      # Portal
+      portal_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/nginx-auth:base"
+      username: ""  # Don't need to set when auth_mode is JWT
+      password: ""  # Don't need to set when auth_mode is JWT
+      auth_mode: "JWT"  # JWT, PASSWORD
+      introspec_endpoint: ""
+      client_id: ""
+      client_secret: ""
+      http_port: 80  # No Change in Recommendation
+      workdir: *workdir  # Where do you want to storage all data from clinico-omics system?
+      # Keycloak
+      keycloak_image: "jboss/keycloak:11.0.3"
+      keycloak_user: ""
+      keycloak_password: ""
+      db_vendor: "mysql"
+      db_addr: "mysql"  # In docker bridge network
+      db_user: *mysql_user
+      db_password: *mysql_password
+      jdbc_params: "useSSL=false"
+
+  clinico-omics-core:
+    docker-compose.yml:
+      instance: *instance
+      network: *network
+      # Dataseq Core
+      dataseq_core_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.7-326f3544"
+      workdir: *workdir
+      # Tservice
+      tservice_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.9-12891b44"
+      # Datains
+      datains_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.4-9a36403d"
+      # Minio
+      minio_image: "minio/minio"
+      minio_access_key: &minio_access_key ""
+      minio_secret_key: &minio_secret_key ""
+
+    conf/datains-conf.edn:
+      # Database
+      datains_db_user: "datains"
+      datains_db_password: *datains_password
+      # App Store
+      app_store_access_token: ""
+      app_store_host: ""
+      app_store_port: 80
+      app_store_username: ""
+      app_store_password: ""
+      # Minio
+      minio_access_key: *minio_access_key
+      minio_secret_key: *minio_secret_key
+      # OSS
+      enable_oss: *enable_oss
+      oss_endpoint: *oss_endpoint
+      oss_access_key: *oss_access_key
+      oss_secret_key: *oss_secret_key
+      default_fs_service: *default_fs_service
+      # Cromwell
+      cromwell_instance: "http://example.com:8000"
+      cromwell_workflow_root: "oss://choppy-cromwell-result/test-choppy/"
+      cromwell_token: ""
+
+    conf/dataseq-core-conf.edn:
+      mongodb_username: *mongo_initdb_username
+      mongodb_password: *mongo_initdb_password
+
+    conf/tservice-conf.edn:
+      # Database
+      tservice_db_user: "tservice"
+      tservice_db_password: *datains_password
+      # Proxy Server (Shiny Server)
+      proxy_server_dir: "XXX/shiny-server/mountpoints/apps/"
+      proxy_server: "http://XXX/"
+      # Minio
+      minio_access_key: *minio_access_key
+      minio_secret_key: *minio_secret_key
+      # OSS
+      enable_oss: *enable_oss
+      oss_endpoint: *oss_endpoint
+      oss_access_key: *oss_access_key
+      oss_secret_key: *oss_secret_key
+      default_fs_service: *default_fs_service

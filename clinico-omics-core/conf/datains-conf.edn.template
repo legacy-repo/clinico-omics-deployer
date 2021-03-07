@@ -1,0 +1,45 @@
+;; WARNING
+;; The dev-config.edn file is used for local environment variables, such as database credentials.
+;; This file is listed in .gitignore and will be excluded from version control by Git.
+
+{:dev                    false
+ :port                   3000
+ ;; when :nrepl-port is set the application starts the nREPL server on load
+ :nrepl-port             7000
+
+ ;; set your dev database connection URL here
+ :database-url           "postgresql://postgres:5432/datains?user={{ datains_db_user }}&password={{ datains_db_password }}"
+ :datains-workdir        "/data/minio"
+ :app-store-access-token "{{ app_store_access_token }}"
+ :app-store-host         "{{ app_store_host }}"
+ :app-store-port         {{ app_store_port }}
+ :app-utility-bin        "/app/external:/app/external/.env/bin:$PATH"
+ :app-store-username     "{{ app_store_username }}"
+ :app-store-password     "{{ app_store_password }}"
+ :fs-services [{:fs-service             "minio"
+                :fs-endpoint            "{{ minio_endpoint }}"
+                :fs-access-key          "{{ minio_access_key }}"
+                :fs-secret-key          "{{ minio_secret_key }}"
+                :fs-rootdir             "/data/minio"}
+               {% if enable_oss %}
+               {:fs-service             "oss"
+                :fs-endpoint            "{{ oss_endpoint }}"
+                :fs-access-key          "{{ oss_access_key }}"
+                :fs-secret-key          "{{ oss_secret_key }}"
+                :fs-rootdir             ""}
+               {% endif %}]
+ :default-fs-service "{{ default_fs_service }}"
+ :cromwell               {:url    "{{ cromwell_instance }}"
+                          :workflow-root "{{ cromwell_workflow_root }}"
+                          :token  "{{ cromwell_token }}"
+                          :labels [:data_type
+                                   :project
+                                   :regulatory_designation
+                                   :sample_name
+                                   :version]}
+ :tasks                  {:submit-jobs {:cron "0 */1 * * * ?"}
+                          :sync-jobs   {:cron "0 */1 * * * ?"}
+                          :sync-apps   {:cron "0 */1 * * * ?"}
+                          :sync-projects {:cron "0 */1 * * * ?"}}
+ :dingtalk-access-token  "xxxx"
+ :dingtalk-secret        "xxxx"}

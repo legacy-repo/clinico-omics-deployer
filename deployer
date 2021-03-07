@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+import yaml
+import click
+import os
+import sys
+import json
+from jinja2 import Template
+
+
+def read_config(filepath):
+    with open(filepath, 'r') as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+        return data
+
+
+@click.group()
+def cli():
+    pass
+
+
+def current_dir():
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+def get_default_config():
+    return current_dir() + '/config.yml'
+
+
+def get_file_path(root, service):
+    return os.path.join(root, service)
+
+
+def write2file(filepath, content):
+  with open(filepath, 'w') as f:
+    f.write(content)
+
+
+def init_service(name, data):
+    root = get_file_path(current_dir(), name)
+    for filename in data.keys():
+        dest_filepath = get_file_path(root, filename)
+        template_filepath = dest_filepath + '.template'
+        print('Rendering %s' % template_filepath)
+        render_data = data.get(filename)
+        if os.path.exists(template_filepath):
+          with open(template_filepath) as f:
+              template = Template(f.read())
+              rendered = template.render(**render_data)
+              write2file(dest_filepath, rendered)
+        else:
+          print('No such template file: %s' % template_filepath)
+          sys.exit(1)
+
+
+@click.command(help="Initialize compose services by the config file.")
+@click.option('-c', '--config-file', default=get_default_config(), help='Config file for deployer, default value is config.yml')
+@click.option('-d', '--debug', is_flag=True, help='More details.')
+@click.option('-s', '--service', default='all', type=click.Choice(['all', 'core', 'auth', 'database']), help='Which service do you need to initialize? default value is all.')
+def init(config_file, service, debug):
+    click.echo('Initialized the compose services')
+    if os.path.exists(config_file):
+        # Common + Services
+        config = read_config(config_file)
+        services = config.get('services')
+
+        for service in services.keys():
+            init_service(service, services.get(service))
+
+        if debug:
+            print(json.dumps(config, indent=4, sort_keys=True))
+    else:
+        print("No such config file: %s" % config_file)
+
+
+cli.add_command(init)
+
+if __name__ == '__main__':
+    cli()

@@ -1,0 +1,50 @@
+version: '3.3'
+services:
+  portal:
+    image: {{ portal_image }}
+    container_name: {{ instance }}-portal
+    restart: always
+    environment:
+      USERNAME: {{ username }}
+      PASSWORD: {{ password }}
+      AUTH_MODE: {{ auth_mode }}
+      INTROSPEC_ENDPOINT: {{ introspec_endpoint }}
+      CLIENT_ID: {{ client_id }}
+      CLIENT_SECRET: {{ client_secret }}
+    networks:
+      - {{ network }}
+    ports:
+      - {{ http_port }}:80
+    volumes:
+      - {{ workdir }}/clinico-omics/attachments:/data/clinico-omics/attachments
+      - ./nginx:/conf/nginx
+      - ./resty/http.lua:/usr/local/openresty/lualib/resty/http.lua
+      - ./resty/http_headers.lua:/usr/local/openresty/lualib/resty/http_headers.lua
+      - ./resty/openidc.lua:/usr/local/openresty/lualib/resty/openidc.lua
+
+  keycloak:
+    image: {{ keycloak_image }}
+    container_name: {{ instance }}-keycloak
+    environment:
+      KEYCLOAK_USER: {{ keycloak_user }}
+      KEYCLOAK_PASSWORD: {{ keycloak_password }}
+      DB_VENDOR: {{ db_vendor }}
+      DB_ADDR: {{ db_addr }}
+      DB_USER: {{ db_user }}
+      DB_PASSWORD: {{ db_password }}
+      JDBC_PARAMS: {{ jdbc_params }}
+    depends_on:
+      - mysql
+    expose: 
+      - "8080"
+    ports:
+      - "8080:8080"
+    networks:
+      - {{ network }}
+    healthcheck:
+     test: "curl -f http://localhost:8080/auth || exit 1"
+     
+networks:
+  {{ network }}:
+    external:
+      name: {{ network }}
