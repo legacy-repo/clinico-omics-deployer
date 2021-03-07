@@ -12,3 +12,5 @@ arkid-core
 shiny-server/data
 .clj-kondo/
 .lsp/
+custom/*
+!custom/env

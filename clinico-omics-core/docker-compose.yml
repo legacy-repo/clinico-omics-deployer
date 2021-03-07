@@ -11,11 +11,11 @@ services:
       - clinico-omics
     image: postgres
     env_file:
-      - postgres.env
+      - ../custom/env/core/.env
+      - ../custom/env/core/postgres.env
     volumes:
-      - ./data/postgresql:/var/lib/postgresql/data/
-      - ./initdb/postgresql:/docker-entrypoint-initdb.d/
-      - /etc/localtime:/etc/localtime:ro
+      - ${WORKSPACE}/data/postgresql:/var/lib/postgresql/data/
+      - ${WORKSPACE}/initdb/postgresql:/docker-entrypoint-initdb.d/
     ports:
       - 54320:5432
 
@@ -27,13 +27,13 @@ services:
     container_name: "datains-mongodb"
     hostname: "datains-mongodb"
     volumes:
-      - ./conf/mongod.conf:/etc/mongod.conf
-      - ./initdb/mongodb:/docker-entrypoint-initdb.d/
-      - ./data/mongodb/data:/data/db/
-      - ./data/mongodb/log:/var/log/mongodb/
-      - /etc/localtime:/etc/localtime:ro
+      - ${WORKSPACE}/conf/mongod.conf:/etc/mongod.conf
+      - ${WORKSPACE}/initdb/mongodb:/docker-entrypoint-initdb.d/
+      - ${WORKSPACE}/data/mongodb/data:/data/db/
+      - ${WORKSPACE}/data/mongodb/log:/var/log/mongodb/
     env_file:
-      - mongodb.env
+      - ../custom/env/core/.env
+      - ../custom/env/core/mongodb.env
     ports:
       - "27017:27017"
     command: ["-f", "/etc/mongod.conf"]
@@ -50,10 +50,10 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - /data/minio:/data/minio
-      - /etc/localtime:/etc/localtime:ro
+      - ${WORKDIR}/minio:/data/minio
     env_file:
-      - minio.env
+      - ../custom/env/core/.env
+      - ../custom/env/core/minio.env
     command: server /data/minio
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -73,12 +73,13 @@ services:
       - minio
     links:
       - postgres
+    env_file: 
+      - ../custom/env/core/.env
     environment: 
       JAVA_OPTS: '-Dconf=/datains-conf.edn'
     volumes:
-      - /data/minio:/data/minio
-      - ./datains-conf.edn:/datains-conf.edn
-      - /etc/localtime:/etc/localtime:ro
+      - ${WORKDIR}/minio:/data/minio
+      - ${WORKSPACE}/datains-conf.edn:/datains-conf.edn
     expose:
       - "3000"
     # ports:
@@ -96,11 +97,12 @@ services:
       - postgres
     links:
       - postgres
+    env_file: 
+      - ../custom/env/core/.env
     volumes:
-      - /data/minio:/data/minio
-      - ./tservice-plugins:/tservice-plugins
-      - ./tservice-conf.edn:/tservice-conf.edn
-      - /etc/localtime:/etc/localtime:ro
+      - ${WORKDIR}/minio:/data/minio
+      - ${WORKSPACE}/tservice-plugins:/tservice-plugins
+      - ${WORKSPACE}/tservice-conf.edn:/tservice-conf.edn
     environment: 
       WORKDIR: '/data/minio/tservice'
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
@@ -116,14 +118,15 @@ services:
     restart: "always"
     networks:
       - clinico-omics
+    env_file: 
+      - ../custom/env/core/.env
     image: registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.7-326f3544
     depends_on: 
       - mongodb
     links:
       - mongodb
     volumes:
-      - ./dataseq-core-conf.edn:/dataseq-core-conf.edn
-      - /etc/localtime:/etc/localtime:ro
+      - ${WORKSPACE}/dataseq-core-conf.edn:/dataseq-core-conf.edn
     environment: 
       JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
     expose:

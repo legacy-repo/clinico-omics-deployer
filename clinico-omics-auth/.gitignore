@@ -32,5 +32,6 @@ build/
 .vscode/
 
 # 
-db/data
+db/data/*
+!db/data/.gitkeep
 **clinico-omics/**
