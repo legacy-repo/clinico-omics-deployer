@@ -16,3 +16,4 @@ custom/*
 !custom/.gitkeep
 .vscode
 *docker-compose.yml
+*tservice-plugins/

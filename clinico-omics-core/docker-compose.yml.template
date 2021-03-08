@@ -30,16 +30,13 @@ services:
     restart: "always"
     networks:
       - {{ network }}
-    depends_on:
-      - postgres
-      - minio
-    links:
+    external_links:
       - postgres
     environment: 
       JAVA_OPTS: '-Dconf=/datains-conf.edn'
     volumes:
       - {{ workdir }}/minio:/data/minio
-      - ./datains-conf.edn:/datains-conf.edn
+      - ./conf/datains-conf.edn:/datains-conf.edn
     expose:
       - "3000"
 
@@ -50,15 +47,12 @@ services:
     restart: "always"
     networks:
       - {{ network }}
-    depends_on: 
-      - minio
-      - postgres
-    links:
+    external_links:
       - postgres
     volumes:
       - {{ workdir }}/minio:/data/minio
       - ./tservice-plugins:/tservice-plugins
-      - ./tservice-conf.edn:/tservice-conf.edn
+      - ./conf/tservice-conf.edn:/tservice-conf.edn
     environment: 
       WORKDIR: '/data/minio/tservice'
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
@@ -72,12 +66,10 @@ services:
     restart: "always"
     networks:
       - {{ network }}
-    depends_on: 
-      - mongodb
-    links:
+    external_links:
       - mongodb
     volumes:
-      - ./dataseq-core-conf.edn:/dataseq-core-conf.edn
+      - ./conf/dataseq-core-conf.edn:/dataseq-core-conf.edn
     environment: 
       JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
     expose:

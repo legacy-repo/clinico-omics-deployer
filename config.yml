@@ -91,6 +91,7 @@ services:
       app_store_username: ""
       app_store_password: ""
       # Minio
+      minio_endpoint: *minio_endpoint
       minio_access_key: *minio_access_key
       minio_secret_key: *minio_secret_key
       # OSS
@@ -116,6 +117,7 @@ services:
       proxy_server_dir: "XXX/shiny-server/mountpoints/apps/"
       proxy_server: "http://XXX/"
       # Minio
+      minio_endpoint: *minio_endpoint
       minio_access_key: *minio_access_key
       minio_secret_key: *minio_secret_key
       # OSS
