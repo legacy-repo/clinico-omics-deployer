@@ -33,7 +33,7 @@ services:
       DB_USER: {{ db_user }}
       DB_PASSWORD: {{ db_password }}
       JDBC_PARAMS: {{ jdbc_params }}
-    links:
+    external_links:
       - mysql
     expose: 
       - "8080"
