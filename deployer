@@ -5,6 +5,7 @@ import click
 import os
 import sys
 import json
+import subprocess
 from jinja2 import Template
 
 
@@ -32,8 +33,8 @@ def get_file_path(root, service):
 
 
 def write2file(filepath, content):
-  with open(filepath, 'w') as f:
-    f.write(content)
+    with open(filepath, 'w') as f:
+        f.write(content)
 
 
 def init_service(name, data):
@@ -44,13 +45,21 @@ def init_service(name, data):
         print('Rendering %s' % template_filepath)
         render_data = data.get(filename)
         if os.path.exists(template_filepath):
-          with open(template_filepath) as f:
-              template = Template(f.read())
-              rendered = template.render(**render_data)
-              write2file(dest_filepath, rendered)
+            with open(template_filepath) as f:
+                template = Template(f.read())
+                rendered = template.render(**render_data)
+                write2file(dest_filepath, rendered)
         else:
-          print('No such template file: %s' % template_filepath)
-          sys.exit(1)
+            print('No such template file: %s' % template_filepath)
+            sys.exit(1)
+
+
+def clean_servie(name, data):
+    root = get_file_path(current_dir(), name)
+    for filename in data.keys():
+        dest_filepath = get_file_path(root, filename)
+        print("Remove %s" % dest_filepath)
+        os.remove(dest_filepath)
 
 
 @click.command(help="Initialize compose services by the config file.")
@@ -73,7 +82,22 @@ def init(config_file, service, debug):
         print("No such config file: %s" % config_file)
 
 
+@click.command(help="Clean all files which list in gitignore.")
+@click.option('-c', '--config-file', default=get_default_config(), help='Config file for deployer, default value is config.yml')
+def clean(config_file):
+    if os.path.exists(config_file):
+        # Common + Services
+        config = read_config(config_file)
+        services = config.get('services')
+
+        for service in services.keys():
+            clean_servie(service, services.get(service))
+    else:
+        print("No such config file: %s" % config_file)
+
+
 cli.add_command(init)
+cli.add_command(clean)
 
 if __name__ == '__main__':
     cli()

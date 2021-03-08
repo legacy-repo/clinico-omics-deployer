@@ -3,6 +3,8 @@ common:
   instance: &instance "clinico-omics"
   network: &network "clinico-omics-network"
   workdir: &workdir "/data"
+  # Please set all password with *password, if you want to use the same password
+  password: &password ""
 
 storage:
   minio_endpoint: &minio_endpoint "http://example.com:9000"
@@ -73,6 +75,7 @@ services:
       # Datains
       datains_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.4-9a36403d"
       # Minio
+      ## Please install minio-keygen, https://github.com/iwittkau/minio-keygen
       minio_image: "minio/minio"
       minio_access_key: &minio_access_key ""
       minio_secret_key: &minio_secret_key ""
