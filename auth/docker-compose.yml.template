@@ -16,7 +16,6 @@ services:
     ports:
       - {{ http_port }}:80
     volumes:
-      - {{ workdir }}/clinico-omics/attachments:/data/clinico-omics/attachments
       - ./nginx:/conf/nginx
       - ./resty/http.lua:/usr/local/openresty/lualib/resty/http.lua
       - ./resty/http_headers.lua:/usr/local/openresty/lualib/resty/http_headers.lua
