@@ -2,11 +2,14 @@
 common:
   instance: &instance "clinico-omics"
   network: &network "clinico-omics-network"
-  workdir: &workdir "/data"
-  # Please set all password with *password, if you want to use the same password
-  password: &password ""
+  datains_workdir: &datains_workdir "/data/minio/datains"
+  tservice_workdir: &tservice_workdir "/data/minio/tservice"
+  minio_workdir: &minio_workdir "/data/minio"
+  # FIXME: Please set all password with *password, if you want to use the same password
+  password: &password "test"
 
 storage:
+  # FIXME: You need to reset the minio_endpoint based on your ip address
   minio_endpoint: &minio_endpoint "http://example.com:9000"
   # OSS
   enable_oss: &enable_oss false
@@ -23,12 +26,14 @@ services:
       network: *network
       # MySQL
       mysql_image: "mysql:5.7.32"
-      mysql_database: ""
-      mysql_user: &mysql_user ""
+      mysql_database: "keycloak"
+      mysql_user: &mysql_user "keycloak"
+      ## FIXME: You need to set mysql_password and mysql_root_password
       mysql_password: &mysql_password ""
       mysql_root_password: ""
       # PostgreSQL
       postgres_image: "postgres"
+      ## FIXME: You need to set postgres_password and datains_password
       postgres_password: ""
       datains_password: &datains_password ""
       # MongoDB
@@ -39,44 +44,47 @@ services:
       mongo_initdb_username: &mongo_initdb_username ""
       mongo_initdb_password: &mongo_initdb_password ""
 
-  clinico-omics-auth:
+  auth:
     docker-compose.yml:
       instance: *instance
       network: *network
       # Portal
-      portal_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/nginx-auth:base"
+      portal_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/nginx-auth:1.15.8.2"
       username: ""  # Don't need to set when auth_mode is JWT
       password: ""  # Don't need to set when auth_mode is JWT
       auth_mode: "JWT"  # JWT, PASSWORD
-      introspec_endpoint: ""
-      client_id: ""
-      client_secret: ""
+      # FIXME: You need to set introspec_endpoint & client_id & client_secret based on your keycloak configuration
+      introspec_endpoint: "http://xx.xx.xx.xx/auth/realms/master/protocol/openid-connect/token/introspect"
+      client_id: "clinico-omics"
+      client_secret: "97a7d2e8-94f4-48a7-aa90-c8ed206bxxxx"
       http_port: 80  # No Change in Recommendation
-      workdir: *workdir  # Where do you want to storage all data from clinico-omics system?
+      workdir: *minio_workdir  # Where do you want to storage all data from clinico-omics system?
       # Keycloak
       keycloak_image: "jboss/keycloak:11.0.3"
-      keycloak_user: ""
-      keycloak_password: ""
+      keycloak_user: "keycloak"
+      keycloak_password: *mysql_password
       db_vendor: "mysql"
       db_addr: "mysql"  # In docker bridge network
       db_user: *mysql_user
       db_password: *mysql_password
       jdbc_params: "useSSL=false"
 
-  clinico-omics-core:
+  clinico-omics:
     docker-compose.yml:
       instance: *instance
       network: *network
       # Dataseq Core
-      dataseq_core_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/dataseq-core:v0.2.7-326f3544"
-      workdir: *workdir
+      dataseq_core_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/dataseq-core:v0.2.7-326f3544"
       # Tservice
-      tservice_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/tservice:v0.1.9-12891b44"
+      tservice_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/tservice:v0.5.10-b882f753"
+      tservice_workdir: *tservice_workdir
       # Datains
-      datains_image: "registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/datains:v0.3.4-9a36403d"
+      datains_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/datains:v0.3.4-9a36403d"
+      datains_workdir: *datains_workdir
       # Minio
       ## Please install minio-keygen, https://github.com/iwittkau/minio-keygen
       minio_image: "minio/minio"
+      # FIXME: you need to set minio_access_key and minio_secret_key
       minio_access_key: &minio_access_key ""
       minio_secret_key: &minio_secret_key ""
 
@@ -94,6 +102,7 @@ services:
       minio_endpoint: *minio_endpoint
       minio_access_key: *minio_access_key
       minio_secret_key: *minio_secret_key
+      minio_workdir: *minio_workdir
       # OSS
       enable_oss: *enable_oss
       oss_endpoint: *oss_endpoint
@@ -101,6 +110,7 @@ services:
       oss_secret_key: *oss_secret_key
       default_fs_service: *default_fs_service
       # Cromwell
+      # FIXME: you need to set cromwell_instance, cromwell_workflow_root and cromwell_token based on the setting of your cromwell server
       cromwell_instance: "http://example.com:8000"
       cromwell_workflow_root: "oss://choppy-cromwell-result/test-choppy/"
       cromwell_token: ""
@@ -113,9 +123,8 @@ services:
       # Database
       tservice_db_user: "tservice"
       tservice_db_password: *datains_password
-      # Proxy Server (Shiny Server)
-      proxy_server_dir: "XXX/shiny-server/mountpoints/apps/"
-      proxy_server: "http://XXX/"
+      tservice_workdir: *tservice_workdir
+      tservice_plugin_path: "/tservice-plugins"
       # Minio
       minio_endpoint: *minio_endpoint
       minio_access_key: *minio_access_key

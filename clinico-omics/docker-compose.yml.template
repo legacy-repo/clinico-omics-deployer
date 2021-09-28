@@ -13,11 +13,11 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - {{ workdir }}/minio:/data/minio
+      - {{ minio_workdir }}:{{ minio_workdir }}
     environment:
       MINIO_ACCESS_KEY: {{ minio_access_key }}
       MINIO_SECRET_KEY: {{ minio_secret_key }}
-    command: server /data/minio
+    command: server {{ minio_workdir }}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -35,7 +35,7 @@ services:
     environment: 
       JAVA_OPTS: '-Dconf=/datains-conf.edn'
     volumes:
-      - {{ workdir }}/minio:/data/minio
+      - {{ datains_workdir }}:{{ datains_workdir }}
       - ./conf/datains-conf.edn:/datains-conf.edn
     expose:
       - "3000"
@@ -50,11 +50,11 @@ services:
     external_links:
       - postgres
     volumes:
-      - {{ workdir }}/minio:/data/minio
+      - {{ tservice_workdir }}:{{ tservice_workdir }}
       - ./tservice-plugins:/tservice-plugins
       - ./conf/tservice-conf.edn:/tservice-conf.edn
     environment: 
-      WORKDIR: '/data/minio/tservice'
+      WORKDIR: {{ tservice_workdir }}
       JAVA_OPTS: '-Dconf=/tservice-conf.edn'
       RENV_PATHS_CACHE: '/tservice-plugins/cache'
     expose:

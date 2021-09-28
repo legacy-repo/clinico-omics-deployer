@@ -6,18 +6,18 @@
  :port 3000
  ;; when :nrepl-port is set the application starts the nREPL server on load
  :nrepl-port 7000
- :database-url "postgresql://postgres:5432/tservice?user={{ tservice_db_user }}&password={{ tservice_db_password }}"
- ;; Shiny Server
- :proxy-server-dir "{{ proxy_server_dir }}"
- :proxy-server "{{ proxy_server }}"
- :external-bin "/tservice-plugins/external/.env/bin:$PATH"
- :tservice-workdir "/data/minio/tservice"
- :tservice-plugin-path "/tservice-plugins"
+ :enable-cors true
+ :cors-origins [".*"]
+ :database-url "jdbc:postgresql://postgres:5432/tservice?user={{ tservice_db_user }}&password={{ tservice_db_password }}"
+ :external-bin "/app/bin:$PATH"
+ :tservice-workdir "{{ tservice_workdir }}"
+ :tservice-plugin-path "{{ tservice_plugin_path }}"
+ :tservice-run-mode "dev"
  :fs-services [{:fs-service             "minio"
                 :fs-endpoint            "{{ minio_endpoint }}"
                 :fs-access-key          "{{ minio_access_key }}"
                 :fs-secret-key          "{{ minio_secret_key }}"
-                :fs-rootdir             "/data/minio"}
+                :fs-rootdir             "{{ minio_workdir }}"}
                {% if enable_oss %}
                {:fs-service             "oss"
                 :fs-endpoint            "{{ oss_endpoint }}"
@@ -25,4 +25,5 @@
                 :fs-secret-key          "{{ oss_secret_key }}"
                 :fs-rootdir             ""}
                {% endif %}]
- :default-fs-service "minio"}
+ :default-fs-service "minio"
+ :tasks {:sync-tasks {:cron "0 */1 * * * ?"}}}
