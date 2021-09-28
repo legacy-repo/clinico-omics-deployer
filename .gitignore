@@ -17,3 +17,4 @@ custom/*
 .vscode
 *docker-compose.yml
 *tservice-plugins/
+auth-legacy

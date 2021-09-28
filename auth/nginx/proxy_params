@@ -1,0 +1,6 @@
+# proxy_set_header Host $host;
+proxy_http_version 1.1;  # 设置http版本为1.1
+proxy_set_header Connection "";  # 设置Connection为长连接（默认为no）
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;

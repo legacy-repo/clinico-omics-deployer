@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-SOURCE_DIR=$( dirname "${BASH_SOURCE[0]}" )
-git clone https://github.com/clinico-omics/tservice-plugins "$SOURCE_DIR/clinico-omics-core/tservice-plugins"
