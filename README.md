@@ -1,62 +1,163 @@
-# Compose Services
-## 快速开始
+# ClinicoOmics Deployer
+## Prerequisites
+### Install Docker & Docker Compose
 
-## Service List
+For Ubuntu
 
-### Cromwell
-#### 安装配置 Cromwell
+```bash
+# https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+sudo apt-get update
+sudo apt-get install \
+     apt-transport-https \
+     ca-certificates \
+     curl \
+     gnupg \
+     lsb-release
+     
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-##### 拷贝配置文件
-
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+     
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
 ```
-cp cromwell-local.conf /etc/cromwell-local.conf
+
+### Install Miniconda
+
+```bash
+# Assumed to be installed in /opt/local/cobweb
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
-##### 安装 Cromwell 软件
+### Install & Config Cromwell Server
 
-```
-```
+```bash
+# Create the conda configuration file
+cat << EOF > ~/.condarc
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - anaconda
+  - fastai
+  - pytorch
+show_channel_urls: true
+auto_activate_base: false
+anaconda_upload: true
+EOF
 
-#### 使用方法
+# Create a new environmet for cromwell
+conda create -n cromwell-35 java-jdk=8.0.112
 
-##### 启动 MySQL
-
-```
+# Launch the mysql database for the cromwell server
+wget http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/clinico-omics/cromwell.zip
+unzip cromwell.zip
+cd cromwell
 docker-compose up -d
 
-# 遇到 Permission Denied 时，修改 data/mysql 与 data/mysql-log 权限
-chown polkitd data/mysql data/mysql-log
-```
+# Get the customized cromwell-35 from ClinicoOmics Developer or download from the link
+# wget http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/clinico-omics/cromwell-35.tar.gz
+mkdir /opt/local/cobweb/envs/cromwell-35/share/cromwell
+tar -xzvf cromwell-35.tar.gz -C /opt/local/cobweb/envs/cromwell-35/share/cromwell
 
-##### 启动 Cromwell 服务
-前提：系统上已经安装 Cromwell 服务，具体安装方法详见`安装 Cromwell`
+# Create a systemd service for cromwell
+cat << EOF > /lib/systemd/system/cromwell-35.service
+[Unit]
+Description=Cromwell server daemon
+After=network.target
 
-```
+[Service]
+Type=simple
+ExecStart=/opt/local/cobweb/envs/cromwell-35/bin/java -Xms512m -Xmx1g -Dconfig.file=/etc/cromwell-35.conf -jar /opt/local/cobweb/envs/cromwell-35/share/cromwell/cromwell.jar server
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Get the Cromwell configuration file from ClinicoOmics Developer or download from the link
+wget http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/clinico-omics/cromwell-35-local.conf
+cp cromwell-35-local.conf /etc/cromwell-35.conf
+
+# Launch the cromwell
 systemctl start cromwell-35
 ```
 
-### Metabase
-1. Get the build version of metabase from aliyun docker registry.
-e.g. registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/metabase:tgmc-ed1edf0f
+## Quick Start
 
-2. Modify METABASE_BUILD_VERSION variable in `metabase/config/metabase_database.env` for docker-compose
-```
-METABASE_BUILD_VERSION=tgmc-ed1edf0f
+### Clone the Clinico Omics Deployer
+
+```bash
+git clone https://github.com/clinico-omics/clinico-omics-deployer
+cd clinico-omics-deployer
+
+pip3 install virtualenv
+virtualenv .env
+source .env/bin/activate
+pip3 install -r requirements.txt
 ```
 
-3. Sync the metabase directory to the server
-```
-rsync -avP ./metabase/ <remote-directory> --exclude data
+### Make a copy of the config.yml.template
+
+```bash
+cp config.yml.template custom/config.yml
 ```
 
-4. Launch metabase service
+### Modify the configuration file based on your situation
+
+Please check the comments for more details in custom/config.yml.
+
+### Initial the configuration files for services
+
+```bash
+./deployer init -c custom/config.yml
 ```
-cd <remote-direcotry>
+
+### Launch all services
+
+```bash
+# Firstly, launch the database
+cd ./database
+docker-compose up -d
+
+# Secondly, launch the clinico-omics
+cd ../clinico-omics
+docker-compose up -d
+
+# Lastly, launch the auth
+cd ../auth
 docker-compose up -d
 ```
 
-### Shiny-server
+### Configuration Auth Service
 
-### Yapi
+Access Keycloak Server by `http://<IP_ADDR>:8080/auth`.
 
-### Drone
+After login, you need to click the import button and the import the `realm-export.json` from `./auth/config/` directory.
+
+### Build Frontend
+
+1. Clone the clinico-omics-studio
+   
+     ```bash
+     git clone https://github.com/clinico-omics/clinico-omics-studio
+     ```   
+
+2. Open the `<clinico-omics-studio>/src/custom/clinico-omics/config.js` file
+3. Modify the `apiService` variable based on the ip address of the server
+4. Modify the `clientSecret` variable based on the value of the client_secret variable which you set in the `<clinico-omics-deployer>/custom/config.yml`
+5. Build the clinico-omics-studio
+
+     ```bash
+     yarn && yarn build
+     ```
+
+6. Copy the frontend code into `<clinico-omics-deployer>/auth/nginx/clinico-omics` directory
+7. Open your browser and access the `http://<IP_ADDR>`
+
+## FAQs

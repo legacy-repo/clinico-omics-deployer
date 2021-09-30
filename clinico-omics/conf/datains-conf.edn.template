@@ -9,7 +9,7 @@
 
  ;; set your dev database connection URL here
  :database-url           "postgresql://postgres:5432/datains?user={{ datains_db_user }}&password={{ datains_db_password }}"
- :datains-workdir        "/data/minio"
+ :datains-workdir        "{{ datains_workdir }}"
  :app-store-access-token "{{ app_store_access_token }}"
  :app-store-host         "{{ app_store_host }}"
  :app-store-port         {{ app_store_port }}
@@ -20,7 +20,7 @@
                 :fs-endpoint            "{{ minio_endpoint }}"
                 :fs-access-key          "{{ minio_access_key }}"
                 :fs-secret-key          "{{ minio_secret_key }}"
-                :fs-rootdir             "/data/minio"}
+                :fs-rootdir             "{{ minio_workdir }}"}
                {% if enable_oss %}
                {:fs-service             "oss"
                 :fs-endpoint            "{{ oss_endpoint }}"
@@ -28,6 +28,10 @@
                 :fs-secret-key          "{{ oss_secret_key }}"
                 :fs-rootdir             ""}
                {% endif %}]
+ :whitelist   {:oss {{ oss_whitelist | tojson }}
+               :minio {{ minio_whitelist | tojson }}}
+ :blacklist   {:oss {{ oss_blacklist | tojson }}
+               :minio {{ minio_blacklist | tojson }}}
  :default-fs-service "{{ default_fs_service }}"
  :cromwell               {:url    "{{ cromwell_instance }}"
                           :workflow-root "{{ cromwell_workflow_root }}"
@@ -41,5 +45,10 @@
                           :sync-jobs   {:cron "0 */1 * * * ?"}
                           :sync-apps   {:cron "0 */1 * * * ?"}
                           :sync-projects {:cron "0 */1 * * * ?"}}
- :dingtalk-access-token  "xxxx"
- :dingtalk-secret        "xxxx"}
+ :dingtalk-access-token  "{{ dingtalk_access_token }}"
+ :dingtalk-secret        "{{ dingtalk_secret }}"
+ :email                  {:host "{{ email_host }}"
+                          :port {{ email_port }}
+                          :ssl  {{ email_enable_ssl }}
+                          :user "{{ email_account }}"
+                          :pass "{{ email_password }}"}}

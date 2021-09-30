@@ -10,19 +10,23 @@ services:
       - {{ network }}
     expose:
       - "9000"
-    ports:
-      - "9000:9000"
+      - "9001"
     volumes:
       - {{ minio_workdir }}:{{ minio_workdir }}
     environment:
-      MINIO_ACCESS_KEY: {{ minio_access_key }}
-      MINIO_SECRET_KEY: {{ minio_secret_key }}
-    command: server {{ minio_workdir }}
+      MINIO_ROOT_USER: {{ minio_access_key }}
+      MINIO_ROOT_PASSWORD: {{ minio_secret_key }}
+    command: server {{ minio_workdir }} --console-address :9001
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
+    ports:
+      - "9000:9000"      
+    {%- if enable_ports is true %}
+      - "9001:9001"
+    {% endif %}
 
   datains:
     image: {{ datains_image }}
@@ -32,6 +36,8 @@ services:
       - {{ network }}
     external_links:
       - postgres
+    depends_on:
+      - minio
     environment: 
       JAVA_OPTS: '-Dconf=/datains-conf.edn'
     volumes:
@@ -39,6 +45,15 @@ services:
       - ./conf/datains-conf.edn:/datains-conf.edn
     expose:
       - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/apps"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    {%- if enable_ports is true %}
+    ports:
+      - "3000:3000"
+    {% endif %}
 
   tservice:
     image: {{ tservice_image }}
@@ -49,6 +64,8 @@ services:
       - {{ network }}
     external_links:
       - postgres
+    depends_on:
+      - minio
     volumes:
       - {{ tservice_workdir }}:{{ tservice_workdir }}
       - ./tservice-plugins:/tservice-plugins
@@ -59,6 +76,15 @@ services:
       RENV_PATHS_CACHE: '/tservice-plugins/cache'
     expose:
       - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/version"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    {%- if enable_ports is true %}
+    ports:
+      - "3001:3000"
+    {% endif %}
 
   dataseq_core:
     image: {{ dataseq_core_image }}
@@ -74,6 +100,15 @@ services:
       JAVA_OPTS: '-Dconf=/dataseq-core-conf.edn'
     expose:
       - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/ping"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    {%- if enable_ports is true %}
+    ports:
+      - "3002:3000"
+    {% endif %}
 
 networks:
   {{ network }}:

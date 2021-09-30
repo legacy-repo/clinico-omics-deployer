@@ -23,7 +23,7 @@
                 :fs-endpoint            "{{ oss_endpoint }}"
                 :fs-access-key          "{{ oss_access_key }}"
                 :fs-secret-key          "{{ oss_secret_key }}"
-                :fs-rootdir             ""}
+                :fs-rootdir             nil}
                {% endif %}]
  :default-fs-service "minio"
  :tasks {:sync-tasks {:cron "0 */1 * * * ?"}}}

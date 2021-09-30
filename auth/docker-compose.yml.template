@@ -4,6 +4,10 @@ services:
     image: {{ portal_image }}
     container_name: {{ instance }}-portal
     restart: always
+    external_links:
+      - datains
+      - tservice
+      - dataseq_core
     environment:
       USERNAME: {{ username }}
       PASSWORD: {{ password }}
@@ -15,6 +19,8 @@ services:
       - {{ network }}
     ports:
       - {{ http_port }}:80
+    healthcheck:
+      test: "curl -f http://localhost:80 || exit 1"
     volumes:
       - ./nginx:/conf/nginx
       - ./resty/http.lua:/usr/local/openresty/lualib/resty/http.lua
@@ -32,16 +38,22 @@ services:
       DB_USER: {{ db_user }}
       DB_PASSWORD: {{ db_password }}
       JDBC_PARAMS: {{ jdbc_params }}
+      PROXY_ADDRESS_FORWARDING: 'true'
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/realm-export.json
+    volumes:
+      - ./config:/opt/jboss/keycloak/imports
     external_links:
       - mysql
     expose: 
       - "8080"
-    ports:
-      - "8080:8080"
     networks:
       - {{ network }}
     healthcheck:
-     test: "curl -f http://localhost:8080/auth || exit 1"
+      test: "curl -f http://localhost:8080/auth || exit 1"
+    {%- if enable_ports is true %}
+    ports:
+      - "8080:8080"
+    {% endif %}
      
 networks:
   {{ network }}:

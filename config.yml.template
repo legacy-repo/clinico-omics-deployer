@@ -2,57 +2,72 @@
 common:
   instance: &instance "clinico-omics"
   network: &network "clinico-omics-network"
+  enable_ports: &enable_ports true
+  http_port: &http_port 80  # No Change in Recommendation
 
   # FIXME: you can change these fields
+  # NOTE: datains_workdir and tservice_workdir must be the subdirectory of minio_workdir and minio_workdir must exist on your server.
   datains_workdir: &datains_workdir "/data/minio/datains"
   tservice_workdir: &tservice_workdir "/data/minio/tservice"
   minio_workdir: &minio_workdir "/data/minio"
 
-  # FIXME: you need to set minio_access_key and minio_secret_key
-  minio_access_key: &minio_access_key ""
-  minio_secret_key: &minio_secret_key ""
-
-  # FIXME: Please set all password with *password, if you want to use the same password
-  password: &password "test"
-
   # FIXME: You need to set introspec_endpoint & client_id & client_secret based on your keycloak configuration
-  introspec_endpoint: &introspec_endpoint "http://xx.xx.xx.xx/auth/realms/master/protocol/openid-connect/token/introspect"
+  # NOTE: DONT USE localhost
+  introspec_endpoint: &introspec_endpoint "http://xxxx/auth/realms/master/protocol/openid-connect/token/introspect"
   client_id: &client_id "clinico-omics"
-  client_secret: &client_secret "97a7d2e8-94f4-48a7-aa90-c8ed206bxxxx"
+  client_secret: &client_secret "c2472734-2fa9-4d85-b73b-45973624152d"
+  email_password: &email_password "this_is_a_password"
+  email_name: &email_name "ClinicoOmics Team"
+  email_port: &email_port 465
+  email_host: &email_host "smtp.163.com"
+  email_account: &email_account "yjcyxky@163.com"
+  email_enable_ssl: &email_enable_ssl true
 
   ## FIXME: You need to set mysql_password and mysql_root_password
   mysql_user: &mysql_user "keycloak"
-  mysql_password: &mysql_password ""
-  mysql_root_password: &mysql_root_password ""
+  mysql_password: &mysql_password "keycloak-password"
+  mysql_root_password: &mysql_root_password "keycloak-password"
 
   ## FIXME: You need to set postgres_password and datains_password
-  postgres_password: &postgres_password ""
-  datains_password: &datains_password ""
+  postgres_password: &postgres_password "postgres-password"
+  datains_password: &datains_password "postgres-password"
 
   ## FIXME: You need to set mongo_initdb_username and mongo_initdb_password
-  mongo_initdb_username: &mongo_initdb_username ""
-  mongo_initdb_password: &mongo_initdb_password ""
+  mongo_initdb_username: &mongo_initdb_username "mongo-username"
+  mongo_initdb_password: &mongo_initdb_password "mongo-password"
 
   # FIXME: you need to set cromwell_instance, cromwell_workflow_root and cromwell_token based on the setting of your cromwell server
-  cromwell_instance: &cromwell_instance ""
-  cromwell_workflow_root: &cromwell_workflow_root "oss://choppy-cromwell-result/test-choppy/"
+  # NOTE: DONT USE localhost/127.0.0.1
+  cromwell_instance: &cromwell_instance "http://xxxx:8000"
+  cromwell_workflow_root: &cromwell_workflow_root "/mnt/cromwell-result"
   cromwell_token: &cromwell_token ""
 
 image:
   # FIXME: you can change these field
   portal_image: &portal_image "registry.cn-shanghai.aliyuncs.com/clinico-omics/nginx-auth:1.15.8.2"
   tservice_image: &tservice_image "registry.cn-shanghai.aliyuncs.com/clinico-omics/tservice:v0.5.10-b882f753"
-  datains_image: &datains_image "registry.cn-shanghai.aliyuncs.com/clinico-omics/datains:v0.3.4-9a36403d"
-  dataseq_core_image: &dataseq_core_image "registry.cn-shanghai.aliyuncs.com/clinico-omics/dataseq-core:v0.2.7-326f3544"
+  datains_image: &datains_image "registry.cn-shanghai.aliyuncs.com/clinico-omics/datains:v0.4.2-950ba8f2"
+  dataseq_core_image: &dataseq_core_image "registry.cn-shanghai.aliyuncs.com/clinico-omics/dataseq-core:v0.2.8-1df04ddb"
 
 storage:
   # FIXME: You need to reset the minio_endpoint based on your ip address
-  minio_endpoint: &minio_endpoint "http://example.com:9000"
+  # NOTE: DONT USE localhost/127.0.0.1
+  minio_endpoint: &minio_endpoint "http://xxxx:9000"
+  # FIXME: you need to set minio_access_key and minio_secret_key
+  # NOTE: minio_access_key is similar with username and minio_secret_key is similar with password
+  minio_access_key: &minio_access_key "clinico-omics"
+  minio_secret_key: &minio_secret_key "clinico-omics-password"
+  minio_whitelist: &minio_whitelist ["tservice", "datains"]
+  minio_blacklist: &minio_blacklist []
+
   # OSS
   enable_oss: &enable_oss false
   oss_endpoint: &oss_endpoint "http://oss-cn-shanghai.aliyuncs.com"
   oss_access_key: &oss_access_key "oss_access_key"
   oss_secret_key: &oss_secret_key "oss_secret_key"
+  oss_whitelist: &oss_whitelist ["tservice", "datains"]
+  oss_blacklist: &oss_blacklist []
+
   default_fs_service: &default_fs_service "minio"
 
 # ******************************************************************************
@@ -64,20 +79,21 @@ services:
       # Common
       instance: *instance
       network: *network
+      enable_ports: *enable_ports
       # MySQL
-      mysql_image: "mysql:5.7.32"
+      mysql_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/mysql:5.7.32"
       mysql_database: "keycloak"
       mysql_user: *mysql_user
       mysql_password: *mysql_password
       mysql_root_password: *mysql_root_password
       # PostgreSQL
-      postgres_image: "postgres"
+      postgres_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/postgres"
       postgres_password: *postgres_password
       datains_password: *datains_password
       # MongoDB
-      mongodb_image: "mongo:4.0.5"
-      mongo_initdb_root_username: ""
-      mongo_initdb_root_password: ""
+      mongodb_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/mongo:4.0.5"
+      mongo_initdb_root_username: *mongo_initdb_username
+      mongo_initdb_root_password: *mongo_initdb_password
       mongo_initdb_database: "dataseq-core"
       mongo_initdb_username: *mongo_initdb_username
       mongo_initdb_password: *mongo_initdb_password
@@ -86,6 +102,7 @@ services:
     docker-compose.yml:
       instance: *instance
       network: *network
+      enable_ports: *enable_ports
       # Portal
       portal_image: *portal_image
       username: ""  # Don't need to set when auth_mode is JWT
@@ -94,10 +111,10 @@ services:
       introspec_endpoint: *introspec_endpoint
       client_id: *client_id
       client_secret: *client_secret
-      http_port: 80  # No Change in Recommendation
+      http_port: *http_port
       workdir: *minio_workdir  # Where do you want to storage all data from clinico-omics system?
       # Keycloak
-      keycloak_image: "jboss/keycloak:11.0.3"
+      keycloak_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/keycloak:15.0.1"
       keycloak_user: "keycloak"
       keycloak_password: *mysql_password
       db_vendor: "mysql"
@@ -106,10 +123,20 @@ services:
       db_password: *mysql_password
       jdbc_params: "useSSL=false"
 
+    config/realm-export.json:
+      client_secret: *client_secret
+      email_password: *email_password
+      email_name: *email_name
+      email_port: *email_port
+      email_host: *email_host
+      email_account: *email_account
+      email_enable_ssl: *email_enable_ssl
+
   clinico-omics:
     docker-compose.yml:
       instance: *instance
       network: *network
+      enable_ports: *enable_ports
       # Dataseq Core
       dataseq_core_image: *dataseq_core_image
       # Tservice
@@ -120,7 +147,7 @@ services:
       datains_workdir: *datains_workdir
       # Minio
       ## Please install minio-keygen, https://github.com/iwittkau/minio-keygen
-      minio_image: "minio/minio"
+      minio_image: "registry.cn-shanghai.aliyuncs.com/clinico-omics/minio"
       minio_workdir: *minio_workdir
       minio_access_key: *minio_access_key
       minio_secret_key: *minio_secret_key
@@ -129,6 +156,7 @@ services:
       # Database
       datains_db_user: "datains"
       datains_db_password: *datains_password
+      datains_workdir: *datains_workdir
       # App Store
       app_store_access_token: ""
       app_store_host: ""
@@ -140,16 +168,27 @@ services:
       minio_access_key: *minio_access_key
       minio_secret_key: *minio_secret_key
       minio_workdir: *minio_workdir
+      minio_whitelist: *minio_whitelist
+      minio_blacklist: *minio_blacklist
       # OSS
       enable_oss: *enable_oss
       oss_endpoint: *oss_endpoint
       oss_access_key: *oss_access_key
       oss_secret_key: *oss_secret_key
+      oss_whitelist: *oss_whitelist
+      oss_blacklist: *oss_blacklist
       default_fs_service: *default_fs_service
       # Cromwell
       cromwell_instance: *cromwell_instance
       cromwell_workflow_root: *cromwell_workflow_root
       cromwell_token: *cromwell_token
+      # Email
+      email_password: *email_password
+      email_name: *email_name
+      email_port: *email_port
+      email_host: *email_host
+      email_account: *email_account
+      email_enable_ssl: *email_enable_ssl
 
     conf/dataseq-core-conf.edn:
       mongodb_username: *mongo_initdb_username

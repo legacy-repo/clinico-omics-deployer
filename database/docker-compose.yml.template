@@ -5,8 +5,6 @@ services:
     container_name: {{ instance }}-mysql
     expose: 
       - "3306"
-    ports:
-      - 3306:3306
     networks:
       - {{ network }}
     environment:
@@ -17,7 +15,11 @@ services:
     volumes:
       - ./data/mysql:/var/lib/mysql
     healthcheck:
-     test: "mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}"
+      test: "mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}"
+    {%- if enable_ports is true %}
+    ports:
+      - 3306:3306
+    {% endif %}
 
   # Misc Storage
   postgres:
@@ -32,8 +34,10 @@ services:
     volumes:
       - ./data/postgresql:/var/lib/postgresql/data/
       - ./initdb/postgresql:/docker-entrypoint-initdb.d/
+    {%- if enable_ports is true %}
     ports:
       - 5432:5432
+    {% endif %}
 
   mongodb:
     image: {{ mongodb_image }}
@@ -52,9 +56,11 @@ services:
       - MONGO_INITDB_DATABASE={{ mongo_initdb_database }}
       - MONGO_INITDB_USERNAME={{ mongo_initdb_username }}
       - MONGO_INITDB_PASSWORD={{ mongo_initdb_password }}
+    command: ["-f", "/etc/mongod.conf"]
+    {%- if enable_ports is true %}
     ports:
       - "27017:27017"
-    command: ["-f", "/etc/mongod.conf"]
+    {% endif %}
 
 networks:
   {{ network }}:

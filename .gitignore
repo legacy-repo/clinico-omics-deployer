@@ -18,3 +18,6 @@ custom/*
 *docker-compose.yml
 *tservice-plugins/
 auth-legacy
+database/data
+auth/config/realm-export.json
+auth/nginx/clinico-omics
